@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>你是哪种失眠？｜高仰珍无忧睡眠</title>
+<style>
+/* ========== Reset & Base ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== Screens ========== */
+.screen { display: none; min-height: 100vh; flex-direction: column; align-items: center; padding: 0 1.25rem 2rem; }
+.screen.active { display: flex; }
+
+/* ========== Start Screen ========== */
+#startScreen {
+  justify-content: center; text-align: center;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+}
+.start-moon {
+  width: 5rem; height: 5rem; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ff9f43, #e87e0a);
+  box-shadow: 0 0 2rem rgba(255,159,67,0.4), 0 0 4rem rgba(255,159,67,0.2);
+  margin-bottom: 1.5rem;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-0.625rem); }
+}
+.start-stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+.star {
+  position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%;
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+@keyframes twinkle { 0% { opacity: 0.2; } 100% { opacity: 1; } }
+
+.start-title {
+  font-size: 1.75rem; font-weight: 700; line-height: 1.3;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff, #ff9f43);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.start-subtitle {
+  font-size: 0.95rem; line-height: 1.6; color: #a0a0b8;
+  margin-bottom: 2.5rem; max-width: 20rem;
+}
+.start-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.875rem 2.5rem; border: none; border-radius: 3rem;
+  background: linear-gradient(135deg, #ff9f43, #ff7f00);
+  color: #fff; font-size: 1.1rem; font-weight: 600;
+  cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0.25rem 1.5rem rgba(255,159,67,0.4);
+}
+.start-btn:active { transform: scale(0.96); }
+.start-brand {
+  margin-top: 2.5rem; font-size: 0.8rem; color: #5a5a7a;
+}
+
+/* ========== Quiz Screen ========== */
+#quizScreen { padding-top: 3rem; }
+.quiz-header {
+  width: 100%; max-width: 28rem; display: flex;
+  justify-content: space-between; align-items: center;
+  margin-bottom: 1.5rem;
+}
+.quiz-back {
+  background: none; border: none; color: #a0a0b8; font-size: 0.85rem;
+  cursor: pointer; padding: 0.25rem 0;
+}
+.quiz-progress-text { font-size: 0.85rem; color: #a0a0b8; }
+.progress-bar-wrap {
+  width: 100%; max-width: 28rem; height: 0.375rem;
+  background: rgba(255,255,255,0.1); border-radius: 0.25rem;
+  margin-bottom: 2rem; overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%; width: 0%; border-radius: 0.25rem;
+  background: linear-gradient(90deg, #ff9f43, #ff7f00);
+  transition: width 0.4s ease;
+}
+.quiz-question-num {
+  font-size: 0.8rem; color: #ff9f43; font-weight: 600;
+  margin-bottom: 0.5rem; letter-spacing: 0.05rem;
+}
+.quiz-question-text {
+  font-size: 1.2rem; font-weight: 600; line-height: 1.5;
+  margin-bottom: 2rem; max-width: 28rem;
+}
+.quiz-options { width: 100%; max-width: 28rem; display: flex; flex-direction: column; gap: 0.75rem; }
+.quiz-option {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1rem 1.25rem; border-radius: 0.75rem;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #e0e0f0; font-size: 0.95rem; line-height: 1.4;
+  cursor: pointer; transition: all 0.2s ease;
+  text-align: left;
+}
+.quiz-option:active { transform: scale(0.98); }
+.quiz-option.selected, .quiz-option:active {
+  background: rgba(255,159,67,0.15);
+  border-color: #ff9f43;
+}
+.option-letter {
+  flex-shrink: 0; width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 700;
+  background: rgba(255,255,255,0.1); color: #a0a0b8;
+  transition: all 0.2s;
+}
+.quiz-option.selected .option-letter {
+  background: #ff9f43; color: #fff;
+}
+
+/* Fade-in animation */
+.fade-in {
+  animation: fadeIn 0.4s ease forwards;
+  opacity: 0; transform: translateY(1rem);
+}
+@keyframes fadeIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== Result Screen ========== */
+#resultScreen { padding-top: 2rem; }
+.result-card {
+  width: 100%; max-width: 28rem;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 1.25rem; padding: 2rem 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.result-icon {
+  font-size: 3rem; margin-bottom: 0.75rem;
+  display: block; text-align: center;
+}
+.result-type {
+  font-size: 1.5rem; font-weight: 700; text-align: center;
+  margin-bottom: 0.25rem;
+}
+.result-type-label {
+  font-size: 0.8rem; color: #a0a0b8; text-align: center;
+  margin-bottom: 1.5rem;
+}
+.result-section { margin-bottom: 1.25rem; }
+.result-section-title {
+  font-size: 0.8rem; font-weight: 600; color: #ff9f43;
+  margin-bottom: 0.5rem; letter-spacing: 0.03rem;
+}
+.result-section-text {
+  font-size: 0.9rem; line-height: 1.7; color: #c8c8e0;
+}
+.result-solutions { list-style: none; }
+.result-solutions li {
+  display: flex; gap: 0.5rem; align-items: flex-start;
+  font-size: 0.9rem; line-height: 1.6; color: #c8c8e0;
+  margin-bottom: 0.5rem;
+}
+.solution-num {
+  flex-shrink: 0; width: 1.5rem; height: 1.5rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700;
+  background: rgba(255,159,67,0.2); color: #ff9f43;
+}
+
+.result-product {
+  background: rgba(255,159,67,0.1);
+  border: 1px solid rgba(255,159,67,0.3);
+  border-radius: 0.75rem; padding: 1rem; margin-bottom: 1.25rem;
+  text-align: center;
+}
+.result-product-name {
+  font-size: 1rem; font-weight: 700; color: #ff9f43; margin-bottom: 0.25rem;
+}
+.result-product-price {
+  font-size: 0.85rem; color: #a0a0b8; margin-bottom: 0.5rem;
+}
+.result-product-desc {
+  font-size: 0.8rem; line-height: 1.5; color: #c8c8e0;
+}
+
+.result-qr {
+  text-align: center; margin-bottom: 1.5rem;
+}
+.result-qr-img {
+  width: 7rem; height: 7rem; border-radius: 0.5rem;
+  background: rgba(255,255,255,0.9);
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #1a1a2e; font-size: 0.7rem; padding: 0.5rem;
+}
+.result-qr-text {
+  font-size: 0.75rem; color: #a0a0b8; margin-top: 0.5rem;
+}
+
+.result-actions {
+  display: flex; gap: 0.75rem; width: 100%; max-width: 28rem;
+  flex-wrap: wrap; justify-content: center;
+}
+.result-btn {
+  flex: 1; min-width: 8rem; padding: 0.75rem 1rem; border: none; border-radius: 2rem;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.result-btn:active { transform: scale(0.96); }
+.btn-primary {
+  background: linear-gradient(135deg, #ff9f43, #ff7f00); color: #fff;
+  box-shadow: 0 0.25rem 1rem rgba(255,159,67,0.3);
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.1); color: #c8c8e0;
+  border: 1px solid rgba(255,255,255,0.15);
+}
+
+/* ========== Share Overlay ========== */
+.share-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7); z-index: 100;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 1rem;
+}
+.share-overlay.active { display: flex; }
+.share-card-preview {
+  max-width: 90vw; max-height: 70vh; border-radius: 1rem;
+  box-shadow: 0 1rem 3rem rgba(0,0,0,0.5);
+}
+.share-hint { color: #a0a0b8; font-size: 0.8rem; margin-top: 1rem; }
+.share-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: none; border: none; color: #fff; font-size: 1.5rem;
+  cursor: pointer;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 360px) {
+  html { font-size: 14px; }
+  .start-title { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Stars background -->
+<div class="start-stars" id="starsContainer"></div>
+
+<!-- ========== Screen 1: Start ========== -->
+<div class="screen active" id="startScreen">
+  <div class="start-moon"></div>
+  <h1 class="start-title">你是哪种失眠？</h1>
+  <p class="start-subtitle">失眠分4种类型，用错方法，睡多少都没用。<br>测一测，你是哪一种？</p>
+  <button class="start-btn" onclick="startQuiz()">
+    <span>开始测评</span><span>→</span>
+  </button>
+  <p class="start-brand">高仰珍无忧睡眠</p>
+</div>
+
+<!-- ========== Screen 2: Quiz ========== -->
+<div class="screen" id="quizScreen">
+  <div class="quiz-header">
+    <button class="quiz-back" onclick="restartQuiz()">← 重新开始</button>
+    <span class="quiz-progress-text" id="progressText">第1题 / 共5题</span>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progressFill"></div>
+  </div>
+  <div id="questionArea"></div>
+  <div class="quiz-options" id="optionsArea"></div>
+</div>
+
+<!-- ========== Screen 3: Result ========== -->
+<div class="screen" id="resultScreen">
+  <div class="result-card" id="resultCard"></div>
+  <div class="result-actions">
+    <button class="result-btn btn-secondary" onclick="shareResult()">📤 分享结果</button>
+    <button class="result-btn btn-primary" onclick="restartQuiz()">🔄 重新测试</button>
+  </div>
+</div>
+
+<!-- Share Overlay -->
+<div class="share-overlay" id="shareOverlay">
+  <button class="share-close" onclick="closeShare()">✕</button>
+  <canvas class="share-card-preview" id="shareCanvas"></canvas>
+  <p class="share-hint">长按保存图片，分享给朋友 ↓</p>
+  <a id="shareDownload" style="display:none"></a>
+</div>
+
+<script>
+// ========== Data ==========
+const questions = [
+  {
+    id: 'Q1',
+    text: '躺下后多久能睡着？',
+    options: [
+      { letter: 'A', text: '15分钟内' },
+      { letter: 'B', text: '15-30分钟' },
+      { letter: 'C', text: '30-60分钟' },
+      { letter: 'D', text: '1小时以上' },
+      { letter: 'E', text: '经常超过2小时' },
+    ],
+    scores: {
+      A: [0,0,0,0],
+      B: [1,0,1,0],
+      C: [2,1,2,0],
+      D: [2,2,3,1],
+      E: [3,2,3,1],
+    }
+  },
+  {
+    id: 'Q2',
+    text: '躺下后脑子里在想什么？',
+    options: [
+      { letter: 'A', text: '脑子停不下来，各种事情翻来覆去' },
+      { letter: 'B', text: '不想事情，但就是睡不着' },
+      { letter: 'C', text: '不太困，"再刷一会手机"' },
+      { letter: 'D', text: '脑子清醒，但没有特定想法' },
+    ],
+    scores: {
+      A: [3,0,0,0],
+      B: [0,0,3,0],
+      C: [0,1,0,3],
+      D: [1,1,2,1],
+    }
+  },
+  {
+    id: 'Q3',
+    text: '半夜通常怎么醒？',
+    options: [
+      { letter: 'A', text: '几乎不醒，睡眠连续' },
+      { letter: 'B', text: '因为噪音/做梦醒来，能继续睡' },
+      { letter: 'C', text: '醒来后脑子很清醒，想东想西' },
+      { letter: 'D', text: '凌晨3-4点固定醒来，之后很难再睡' },
+      { letter: 'E', text: '频繁醒（2次以上），感觉没睡好' },
+    ],
+    scores: {
+      A: [0,0,0,0],
+      B: [1,0,1,0],
+      C: [3,0,1,0],
+      D: [2,2,1,0],
+      E: [3,1,2,0],
+    }
+  },
+  {
+    id: 'Q4',
+    text: '早上醒来是什么感觉？',
+    options: [
+      { letter: 'A', text: '自然醒，精神不错' },
+      { letter: 'B', text: '很累，像没睡过一样' },
+      { letter: 'C', text: '需要闹钟，起来很困' },
+      { letter: 'D', text: '凌晨3-4点醒了，之后睡不着' },
+      { letter: 'E', text: '醒来心跳有点快/有焦虑感' },
+    ],
+    scores: {
+      A: [0,0,0,0],
+      B: [2,1,2,1],
+      C: [0,2,1,1],
+      D: [3,1,1,0],
+      E: [3,0,1,0],
+    }
+  },
+  {
+    id: 'Q5',
+    text: '白天什么时候最精神？',
+    options: [
+      { letter: 'A', text: '上午（9-12点）' },
+      { letter: 'B', text: '下午（14-17点）' },
+      { letter: 'C', text: '晚上（19-23点）' },
+      { letter: 'D', text: '全天都差不多，都有点困' },
+    ],
+    scores: {
+      A: [0,0,0,0],
+      B: [0,2,0,0],
+      C: [0,3,0,0],
+      D: [1,1,2,1],
+    }
+  },
+];
+
+const typeKeys = ['anxiety', 'circadian', 'neuroFatigue', 'habitLate'];
+const typeNames = {
+  anxiety: '焦虑型失眠',
+  circadian: '生物钟紊乱型失眠',
+  neuroFatigue: '神经性疲劳型失眠',
+  habitLate: '习惯性熬夜型失眠',
+};
+
+const results = {
+  anxiety: {
+    icon: '🧠',
+    color: '#ff6b6b',
+    label: '焦虑型失眠',
+    problem: '你的皮质醇（压力激素）在夜间降不下来，大脑一直处于"警戒状态"，所以越想睡越清醒。这不是你"不会睡"，而是身体的压力反应系统在夜里还开着。',
+    whyUseless: '你试的方法（数羊、强迫自己睡）都在让大脑更紧张——越努力睡，越睡不着。正确方向是给大脑"安全信号"，而不是"努力指令"。',
+    solutions: [
+      '睡前1小时停止思考重要决策，把脑子里的担心写在纸上"存起来"',
+      '4-7-8呼吸法：吸气4秒→屏息7秒→呼气8秒，重复5次，主动降低皮质醇',
+      '建立睡前仪式感：固定顺序做3件放松小事（如洗脸→调暗灯→听白噪音），让大脑形成条件反射'
+    ],
+  },
+  circadian: {
+    icon: '🕐',
+    color: '#48dbfb',
+    label: '生物钟紊乱型失眠',
+    problem: '你的昼夜节律往后漂移了，身体不知道几点是"该睡觉的时间"。褪黑素该分泌的时候没分泌，该清醒的时候却想睡，整个时间表都错位了。',
+    whyUseless: '补觉和早睡都治标不治本——你强行早睡，但身体节律没跟上，当然睡不着。关键是重建"光照→褪黑素"的信号链，不是靠意志力。',
+    solutions: [
+      '每天固定同一时间起床（不管几点睡），用"起床时间"锚定节律，而不是"上床时间"',
+      '早上8点前晒太阳15分钟（或明亮光线下吃早餐），给身体发送"新的一天开始了"的强信号',
+      '晚上21点后切换暖光（色温＜3000K），避免手机/电脑蓝光，保护褪黑素分泌'
+    ],
+  },
+  neuroFatigue: {
+    icon: '😴',
+    color: '#a29bfe',
+    label: '神经性疲劳型失眠',
+    problem: '你的身体很累了，但交感神经还在"加班"，身体和大脑不同步。就像手机电量1%却还在跑大型游戏——身体再累，神经不放松也睡不着。',
+    whyUseless: '累不等于能睡。你试过"累了就能睡着"，但神经性疲劳的特点是：身体疲劳+神经兴奋同时存在，需要主动激活副交感神经才能入睡。',
+    solutions: [
+      '副交感神经激活：4-7-8呼吸法（吸气4秒→屏息7秒→呼气8秒），或身体扫描冥想10分钟',
+      '睡前1小时不做消耗脑力的事情（工作、争论、刷需要思考的内容），给神经"降温"',
+      '洗热水澡后体温下降的生理过程会天然诱发睡意，利用这个"体温降窗"入睡'
+    ],
+  },
+  habitLate: {
+    icon: '📱',
+    color: '#ff9f43',
+    label: '习惯性熬夜型失眠',
+    problem: '你不缺觉，只是把睡眠时间往后推太多了，大脑已经习惯了"凌晨才是我的时间"。这是行为惯性，不是生理失眠——你的睡眠能力没问题，是睡眠习惯出了问题。',
+    whyUseless: '靠意志力早睡很难成功，因为这是行为惯性，不是困不困的问题。你需要的是"环境设计"和"行为替代"，而不是跟自己的意志力较劲。',
+    solutions: [
+      '设置"强制断电时间"（建议23:30），到点所有电子设备放客厅，不带回卧室',
+      '睡前用"无聊的事"替代刷手机：读纸质书（选枯燥的）、听播客（不选太精彩的）、做简单拉伸',
+      '把"熬夜的快乐"提前到傍晚：想在深夜做的愉悦事情（听音乐、发呆），改到19-21点做，释放"夜间情绪"'
+    ],
+  }
+};
+
+// ========== State ==========
+let currentQ = 0;
+let scores = [0, 0, 0, 0]; // [anxiety, circadian, neuroFatigue, habitLate]
+
+// ========== Stars ==========
+(function initStars() {
+  const container = document.getElementById('starsContainer');
+  for (let i = 0; i < 60; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = (Math.random() * 3).toFixed(1) + 's';
+    star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
+    container.appendChild(star);
+  }
+})();
+
+// ========== Navigation ==========
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  currentQ = 0;
+  scores = [0, 0, 0, 0];
+  showScreen('quizScreen');
+  renderQuestion();
+}
+
+function restartQuiz() {
+  showScreen('startScreen');
+}
+
+// ========== Render Question ==========
+function renderQuestion() {
+  const q = questions[currentQ];
+  const questionArea = document.getElementById('questionArea');
+  const optionsArea = document.getElementById('optionsArea');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+
+  // Update progress
+  const pct = ((currentQ) / questions.length) * 100;
+  progressFill.style.width = pct + '%';
+  progressText.textContent = `第${currentQ + 1}题 / 共${questions.length}题`;
+
+  // Clear
+  questionArea.innerHTML = '';
+  optionsArea.innerHTML = '';
+
+  // Question num + text
+  const numEl = document.createElement('div');
+  numEl.className = 'quiz-question-num fade-in';
+  numEl.textContent = `第 ${currentQ + 1} 题`;
+  questionArea.appendChild(numEl);
+
+  const textEl = document.createElement('div');
+  textEl.className = 'quiz-question-text fade-in';
+  textEl.style.animationDelay = '0.1s';
+  textEl.textContent = q.text;
+  questionArea.appendChild(textEl);
+
+  // Options
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-option fade-in';
+    btn.style.animationDelay = (0.15 + idx * 0.08) + 's';
+    btn.innerHTML = `<span class="option-letter">${opt.letter}</span><span>${opt.text}</span>`;
+    btn.addEventListener('click', () => selectOption(q, opt.letter, btn));
+    optionsArea.appendChild(btn);
+  });
+}
+
+// ========== Select Option ==========
+function selectOption(question, letter, btnEl) {
+  // Visual feedback
+  btnEl.classList.add('selected');
+
+  // Add scores
+  const pts = question.scores[letter];
+  pts.forEach((v, i) => scores[i] += v);
+
+  // Next question or result
+  currentQ++;
+  if (currentQ < questions.length) {
+    setTimeout(() => renderQuestion(), 350);
+  } else {
+    // Update progress bar to 100%
+    document.getElementById('progressFill').style.width = '100%';
+    setTimeout(() => showResult(), 500);
+  }
+}
+
+// ========== Calculate Result ==========
+function calculateResult() {
+  // Check for mixed type: if top two scores differ by <= 1
+  const sorted = scores
+    .map((s, i) => ({ score: s, key: typeKeys[i] }))
+    .sort((a, b) => b.score - a.score);
+
+  const top = sorted[0];
+  const second = sorted[1];
+
+  if (top.score === second.score || (top.score - second.score) <= 1) {
+    // Mixed type
+    const mixedKeys = sorted.filter((item, idx) => {
+      if (idx === 0) return true;
+      return (top.score - item.score) <= 1;
+    }).map(i => i.key);
+
+    return { isMixed: true, keys: mixedKeys, scores: scores };
+  }
+
+  return { isMixed: false, keys: [top.key], scores: scores };
+}
+
+// ========== Show Result ==========
+function showResult() {
+  const result = calculateResult();
+  const card = document.getElementById('resultCard');
+
+  if (result.isMixed) {
+    const labels = result.keys.map(k => results[k].label);
+    const icons = result.keys.map(k => results[k].icon);
+    const colors = result.keys.map(k => results[k].color);
+
+    // Use first type's data as primary, but show mixed label
+    const primary = results[result.keys[0]];
+
+    let html = '';
+    html += `<div class="result-icon">${icons.join(' ')}</div>`;
+    html += `<div class="result-type">混合型失眠</div>`;
+    html += `<div class="result-type-label">你的特点：${labels.join(' + ')}</div>`;
+
+    result.keys.forEach(k => {
+      const r = results[k];
+      html += `<div class="result-section">
+        <div class="result-section-title">${r.icon} ${r.label} — 核心问题</div>
+        <div class="result-section-text">${r.problem}</div>
+      </div>`;
+    });
+
+    // Combined why useless
+    html += `<div class="result-section">
+      <div class="result-section-title">💡 为什么你之前试的方法没用</div>
+      <div class="result-section-text">${primary.whyUseless}</div>
+    </div>`;
+
+    // Combined solutions (first type's)
+    html += `<div class="result-section">
+      <div class="result-section-title">✅ 核心解决方案</div>
+      <ul class="result-solutions">`;
+    primary.solutions.forEach((s, i) => {
+      html += `<li><span class="solution-num">${i+1}</span><span>${s}</span></li>`;
+    });
+    html += `</ul></div>`;
+
+    html += buildProductSection();
+    html += buildQrSection();
+    card.innerHTML = html;
+
+  } else {
+    const r = results[result.keys[0]];
+    let html = '';
+    html += `<div class="result-icon">${r.icon}</div>`;
+    html += `<div class="result-type" style="color:${r.color}">${r.label}</div>`;
+    html += `<div class="result-type-label">你的失眠类型</div>`;
+
+    html += `<div class="result-section">
+      <div class="result-section-title">🔍 核心问题</div>
+      <div class="result-section-text">${r.problem}</div>
+    </div>`;
+
+    html += `<div class="result-section">
+      <div class="result-section-title">💡 为什么你之前试的方法没用</div>
+      <div class="result-section-text">${r.whyUseless}</div>
+    </div>`;
+
+    html += `<div class="result-section">
+      <div class="result-section-title">✅ 核心解决方案</div>
+      <ul class="result-solutions">`;
+    r.solutions.forEach((s, i) => {
+      html += `<li><span class="solution-num">${i+1}</span><span>${s}</span></li>`;
+    });
+    html += `</ul></div>`;
+
+    html += buildProductSection();
+    html += buildQrSection();
+    card.innerHTML = html;
+  }
+
+  showScreen('resultScreen');
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+function buildProductSection() {
+  return `<div class="result-product">
+    <div class="result-product-name">🌙 睡眠力训练营</div>
+    <div class="result-product-price">¥1999 ｜ 28天系统训练</div>
+    <div class="result-product-desc">高仰珍老师亲授，28天重建你的睡眠系统，告别失眠困扰</div>
+  </div>`;
+}
+
+function buildQrSection() {
+  return `<div class="result-qr">
+    <img src="qrcode.jpg" alt="公众号二维码" class="result-qr-img" style="width:7rem;height:7rem;border-radius:0.5rem;object-fit:cover;" onerror="this.onerror=null;this.src='qrcode.png';">
+    <div class="result-qr-text">扫码关注公众号「高仰珍无忧睡眠」<br>获取专属睡眠改善方案</div>
+  </div>`;
+}
+
+// ========== Share ==========
+function shareResult() {
+  const result = calculateResult();
+  const overlay = document.getElementById('shareOverlay');
+  const canvas = document.getElementById('shareCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Canvas size (2x for retina)
+  const W = 600, H = 800;
+  canvas.width = W;
+  canvas.height = H;
+
+  // Background
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#1a1a2e');
+  bgGrad.addColorStop(0.6, '#16213e');
+  bgGrad.addColorStop(1, '#0f3460');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Decorative circles
+  ctx.beginPath();
+  ctx.arc(480, 120, 80, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,159,67,0.08)';
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(60, 700, 60, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(72,219,251,0.06)';
+  ctx.fill();
+
+  // Title
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 28px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('我的失眠类型是', W/2, 100);
+
+  // Type name
+  let typeLabel = '';
+  let typeIcon = '';
+  let typeColor = '#ff9f43';
+
+  if (result.isMixed) {
+    typeIcon = result.keys.map(k => results[k].icon).join(' ');
+    typeLabel = '混合型：' + result.keys.map(k => results[k].label).join(' + ');
+    typeColor = '#ff9f43';
+  } else {
+    const r = results[result.keys[0]];
+    typeIcon = r.icon;
+    typeLabel = r.label;
+    typeColor = r.color;
+  }
+
+  // Draw icon
+  ctx.font = '48px sans-serif';
+  ctx.fillText(typeIcon, W/2, 180);
+
+  // Type label
+  ctx.fillStyle = typeColor;
+  ctx.font = 'bold 26px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillText(typeLabel, W/2, 240);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(80, 280);
+  ctx.lineTo(W - 80, 280);
+  ctx.stroke();
+
+  // Score breakdown
+  ctx.fillStyle = '#a0a0b8';
+  ctx.font = '16px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillText('各类型得分', W/2, 320);
+
+  const barLabels = ['焦虑型', '生物钟型', '神经疲劳型', '习惯熬夜型'];
+  const barColors = ['#ff6b6b', '#48dbfb', '#a29bfe', '#ff9f43'];
+  const maxScore = Math.max(...result.scores, 1);
+
+  result.scores.forEach((s, i) => {
+    const y = 350 + i * 55;
+    const barW = (s / maxScore) * 280;
+
+    ctx.fillStyle = '#333';
+    ctx.fillRect(80, y, 280, 22);
+
+    ctx.fillStyle = barColors[i];
+    ctx.globalAlpha = 0.8;
+    ctx.fillRect(80, y, Math.max(barW, 8), 22);
+    ctx.globalAlpha = 1;
+
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px PingFang SC, Microsoft YaHei, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(barLabels[i], 80, y - 6);
+
+    ctx.textAlign = 'right';
+    ctx.fillText(s + '分', 370, y + 16);
+  });
+
+  // Bottom brand
+  ctx.fillStyle = 'rgba(255,255,255,0.3)';
+  ctx.font = '14px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('高仰珍无忧睡眠｜扫码关注获取改善方案', W/2, H - 50);
+
+  // CTA
+  ctx.fillStyle = '#ff9f43';
+  ctx.font = 'bold 16px PingFang SC, Microsoft YaHei, sans-serif';
+  ctx.fillText('关注公众号「高仰珍无忧睡眠」', W/2, H - 25);
+
+  // Show overlay
+  overlay.classList.add('active');
+}
+
+function closeShare() {
+  document.getElementById('shareOverlay').classList.remove('active');
+}
+
+// Close overlay on background click
+document.getElementById('shareOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeShare();
+});
+</script>
+</body>
+</html>
