@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSQI 睡眠质量自测 · 无忧睡眠</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171f;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent-light: #a89af9;
+    --accent-glow: rgba(124,106,247,0.15);
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --text-dim: #555566;
+    --good: #4ade80;
+    --warn: #facc15;
+    --bad: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    min-height: 100vh;
+    padding: 0 16px 60px;
+    line-height: 1.6;
+  }
+
+  /* ── Header ── */
+  .header {
+    text-align: center;
+    padding: 48px 20px 32px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,106,247,0.35);
+    color: var(--accent-light);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+    text-transform: uppercase;
+  }
+  .header h1 {
+    font-size: clamp(22px, 5vw, 30px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── Progress ── */
+  .progress-wrap {
+    max-width: 680px;
+    margin: 0 auto 32px;
+  }
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-light));
+    border-radius: 99px;
+    transition: width 0.5s cubic-bezier(.4,0,.2,1);
+    width: 0%;
+  }
+
+  /* ── Sections ── */
+  .section {
+    max-width: 680px;
+    margin: 0 auto 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .section.active { border-color: rgba(124,106,247,0.4); }
+  .section-header {
+    padding: 18px 22px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-num {
+    width: 26px; height: 26px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,106,247,0.4);
+    color: var(--accent-light);
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .section-dim-tag {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-dim);
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 99px;
+  }
+
+  /* ── Question ── */
+  .question {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border);
+  }
+  .question:last-child { border-bottom: none; }
+  .q-label {
+    font-size: 14px;
+    color: var(--text);
+    margin-bottom: 14px;
+    line-height: 1.6;
+  }
+  .q-label strong { color: var(--accent-light); }
+
+  /* Time inputs */
+  .input-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .input-field {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 9px 13px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    width: 100px;
+  }
+  .input-field:focus { border-color: var(--accent); }
+  .input-field::placeholder { color: var(--text-dim); }
+  .input-label { font-size: 13px; color: var(--text-muted); }
+
+  /* Radio options */
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+  }
+  .option:hover { border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.05); }
+  .option.selected { border-color: var(--accent); background: rgba(124,106,247,0.12); }
+  .option input[type="radio"] { display: none; }
+  .radio-dot {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s;
+  }
+  .option.selected .radio-dot { border-color: var(--accent); }
+  .radio-dot::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .option.selected .radio-dot::after { opacity: 1; }
+  .option-text { font-size: 13px; color: var(--text); flex: 1; }
+  .option-score { font-size: 11px; color: var(--text-dim); }
+
+  /* Checkbox options (Q5 sub-items) */
+  .freq-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
+  .freq-table th {
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 500;
+    padding: 6px 8px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .freq-table th:first-child { text-align: left; }
+  .freq-table td {
+    padding: 10px 8px;
+    font-size: 13px;
+    color: var(--text);
+    border-bottom: 1px solid rgba(42,42,56,0.5);
+    vertical-align: middle;
+  }
+  .freq-table tr:last-child td { border-bottom: none; }
+  .freq-table td:first-child { padding-left: 0; }
+  .freq-table td.center { text-align: center; }
+  .freq-radio {
+    width: 18px; height: 18px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    margin: 0 auto;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .freq-radio.selected { border-color: var(--accent); background: rgba(124,106,247,0.2); }
+  .freq-radio.selected::after {
+    content: '';
+    width: 7px; height: 7px;
+    background: var(--accent);
+    border-radius: 50%;
+    display: block;
+  }
+
+  /* ── Submit ── */
+  .submit-wrap {
+    max-width: 680px;
+    margin: 24px auto 0;
+    text-align: center;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), #9b8cf5);
+    color: #fff;
+    border: none;
+    padding: 14px 48px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:active { transform: scale(0.98); }
+  .submit-note { font-size: 12px; color: var(--text-dim); margin-top: 10px; }
+
+  /* ── Result ── */
+  #result-panel {
+    max-width: 680px;
+    margin: 0 auto;
+    display: none;
+  }
+  .result-header {
+    text-align: center;
+    padding: 40px 20px 28px;
+  }
+  .score-ring {
+    width: 120px; height: 120px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .score-num {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+  }
+  .score-max { font-size: 12px; color: var(--text-dim); margin-top: 2px; }
+  .result-label {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .result-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 420px;
+    margin: 0 auto;
+  }
+
+  /* Dimension breakdown */
+  .dim-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  @media (max-width: 480px) { .dim-grid { grid-template-columns: 1fr; } }
+  .dim-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+  }
+  .dim-name { font-size: 12px; color: var(--text-muted); margin-bottom: 8px; }
+  .dim-bar-row { display: flex; align-items: center; gap: 10px; }
+  .dim-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .dim-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    transition: width 1s cubic-bezier(.4,0,.2,1);
+  }
+  .dim-score { font-size: 18px; font-weight: 700; min-width: 20px; text-align: right; }
+
+  /* Suggestions */
+  .suggestion-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    margin-bottom: 16px;
+  }
+  .suggestion-box h3 { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text); }
+  .suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+  .suggestion-item:last-child { border-bottom: none; }
+  .suggestion-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  /* CTA */
+  .cta-box {
+    background: linear-gradient(135deg, rgba(124,106,247,0.15), rgba(155,140,245,0.08));
+    border: 1px solid rgba(124,106,247,0.3);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+  .cta-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .cta-box p { font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+  .btn-cta {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #9b8cf5);
+    color: #fff;
+    padding: 11px 32px;
+    border-radius: 99px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .btn-cta:hover { opacity: 0.9; }
+  .btn-retry {
+    margin-top: 12px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 8px 24px;
+    border-radius: 99px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .btn-retry:hover { border-color: var(--accent); color: var(--text); }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    max-width: 680px;
+    margin: 0 auto;
+  }
+
+  /* Scroll reveal */
+  .section { opacity: 0.5; transition: opacity 0.4s; }
+  .section.active { opacity: 1; }
+  .section.answered { opacity: 0.85; }
+
+  /* validation */
+  .q-error { font-size: 12px; color: var(--bad); margin-top: 6px; display: none; }
+  .section.has-error { border-color: rgba(248,113,113,0.5); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="badge">无忧睡眠 · 专业测评</div>
+  <h1>PSQI 睡眠质量自测</h1>
+  <p>匹兹堡睡眠质量指数量表 · 共19题 · 约5分钟完成<br>诚实作答，结果仅用于评估，无对错之分</p>
+</div>
+
+<!-- Main form -->
+<div id="form-area">
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="progress-label">0 / 7 维度已填写</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+
+  <!-- Q1: 主观睡眠质量 -->
+  <div class="section active" id="sec-1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">过去一个月，您如何评价自己的总体睡眠质量？</div>
+      <div class="section-dim-tag">维度①</div>
+    </div>
+    <div class="question">
+      <div class="options" data-key="c1">
+        <label class="option"><input type="radio" name="c1" value="0"><div class="radio-dot"></div><span class="option-text">很好</span><span class="option-score">0分</span></label>
+        <label class="option"><input type="radio" name="c1" value="1"><div class="radio-dot"></div><span class="option-text">较好</span><span class="option-score">1分</span></label>
+        <label class="option"><input type="radio" name="c1" value="2"><div class="radio-dot"></div><span class="option-text">较差</span><span class="option-score">2分</span></label>
+        <label class="option"><input type="radio" name="c1" value="3"><div class="radio-dot"></div><span class="option-text">很差</span><span class="option-score">3分</span></label>
+      </div>
+      <div class="q-error" id="err-c1">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Q2-Q4: 睡眠潜伏期 -->
+  <div class="section" id="sec-2">
+    <div class="section-header">
+      <div class="section-num">2~4</div>
+      <div class="section-title">睡眠潜伏期 — 入睡相关</div>
+      <div class="section-dim-tag">维度②</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q2</strong> 过去一个月，您晚上通常<strong>几点上床</strong>睡觉？</div>
+      <div class="input-row">
+        <input type="time" class="input-field" id="q2_bedtime" placeholder="22:30">
+        <span class="input-label">上床时间</span>
+      </div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q3</strong> 过去一个月，您每晚通常<strong>多少分钟</strong>后才能入睡？</div>
+      <div class="options" data-key="q2b">
+        <label class="option"><input type="radio" name="q2b" value="0"><div class="radio-dot"></div><span class="option-text">≤ 15 分钟</span><span class="option-score">0分</span></label>
+        <label class="option"><input type="radio" name="q2b" value="1"><div class="radio-dot"></div><span class="option-text">16–30 分钟</span><span class="option-score">1分</span></label>
+        <label class="option"><input type="radio" name="q2b" value="2"><div class="radio-dot"></div><span class="option-text">31–60 分钟</span><span class="option-score">2分</span></label>
+        <label class="option"><input type="radio" name="q2b" value="3"><div class="radio-dot"></div><span class="option-text">&gt; 60 分钟</span><span class="option-score">3分</span></label>
+      </div>
+      <div class="q-error" id="err-q2b">请选择一项</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q4</strong> 过去一个月，您是否因<strong>在 30 分钟内不能入睡</strong>而苦恼？</div>
+      <div class="options" data-key="q5a">
+        <label class="option"><input type="radio" name="q5a" value="0"><div class="radio-dot"></div><span class="option-text">过去一个月没有</span></label>
+        <label class="option"><input type="radio" name="q5a" value="1"><div class="radio-dot"></div><span class="option-text">每周不足1次</span></label>
+        <label class="option"><input type="radio" name="q5a" value="2"><div class="radio-dot"></div><span class="option-text">每周1~2次</span></label>
+        <label class="option"><input type="radio" name="q5a" value="3"><div class="radio-dot"></div><span class="option-text">每周3次或以上</span></label>
+      </div>
+      <div class="q-error" id="err-q5a">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Q5-Q6: 睡眠时间 -->
+  <div class="section" id="sec-3">
+    <div class="section-header">
+      <div class="section-num">5~6</div>
+      <div class="section-title">实际睡眠时间</div>
+      <div class="section-dim-tag">维度③</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q5</strong> 过去一个月，您通常<strong>几点起床</strong>？</div>
+      <div class="input-row">
+        <input type="time" class="input-field" id="q3_waketime" placeholder="07:00">
+        <span class="input-label">起床时间</span>
+      </div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q6</strong> 过去一个月，您每晚<strong>实际睡眠</strong>有多少小时？（不计躺床清醒时间）</div>
+      <div class="options" data-key="c3">
+        <label class="option"><input type="radio" name="c3" value="0"><div class="radio-dot"></div><span class="option-text">&gt; 7 小时</span><span class="option-score">0分</span></label>
+        <label class="option"><input type="radio" name="c3" value="1"><div class="radio-dot"></div><span class="option-text">6–7 小时</span><span class="option-score">1分</span></label>
+        <label class="option"><input type="radio" name="c3" value="2"><div class="radio-dot"></div><span class="option-text">5–6 小时</span><span class="option-score">2分</span></label>
+        <label class="option"><input type="radio" name="c3" value="3"><div class="radio-dot"></div><span class="option-text">&lt; 5 小时</span><span class="option-score">3分</span></label>
+      </div>
+      <div class="q-error" id="err-c3">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Q7: 睡眠效率 -->
+  <div class="section" id="sec-4">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title">睡眠效率 — 在床时间中真正睡着的比例</div>
+      <div class="section-dim-tag">维度④</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q7</strong> 根据上面填写的<strong>上床时间、起床时间和实际睡眠时间</strong>，系统将自动计算您的睡眠效率。<br><br>您每晚在床上躺着（含入睡和清醒）的总时间大约是多少小时？</div>
+      <div class="options" data-key="c4_input">
+        <label class="option"><input type="radio" name="c4_input" value="85+"><div class="radio-dot"></div><span class="option-text">睡眠效率 ≥ 85%（睡眠时间/在床时间）</span><span class="option-score">0分</span></label>
+        <label class="option"><input type="radio" name="c4_input" value="75-84"><div class="radio-dot"></div><span class="option-text">睡眠效率 75%–84%</span><span class="option-score">1分</span></label>
+        <label class="option"><input type="radio" name="c4_input" value="65-74"><div class="radio-dot"></div><span class="option-text">睡眠效率 65%–74%</span><span class="option-score">2分</span></label>
+        <label class="option"><input type="radio" name="c4_input" value="<65"><div class="radio-dot"></div><span class="option-text">睡眠效率 &lt; 65%</span><span class="option-score">3分</span></label>
+      </div>
+      <div class="q-error" id="err-c4_input">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Q8-Q16: 睡眠障碍 -->
+  <div class="section" id="sec-5">
+    <div class="section-header">
+      <div class="section-num">8~16</div>
+      <div class="section-title">睡眠障碍 — 各类睡眠问题的频率</div>
+      <div class="section-dim-tag">维度⑤</div>
+    </div>
+    <div class="question">
+      <div class="q-label">过去一个月，您是否因以下原因而出现睡眠困难？</div>
+      <table class="freq-table">
+        <thead>
+          <tr>
+            <th>问题</th>
+            <th>没有</th>
+            <th>&lt;1次/周</th>
+            <th>1~2次/周</th>
+            <th>≥3次/周</th>
+          </tr>
+        </thead>
+        <tbody id="freq-tbody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+      <div class="q-error" id="err-c5">请填写所有项目</div>
+    </div>
+  </div>
+
+  <!-- Q17: 催眠药物 -->
+  <div class="section" id="sec-6">
+    <div class="section-header">
+      <div class="section-num">17</div>
+      <div class="section-title">催眠药物 — 是否使用帮助睡眠的药物</div>
+      <div class="section-dim-tag">维度⑥</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q17</strong> 过去一个月，您是否服用过<strong>帮助睡眠的药物</strong>（处方或非处方）？</div>
+      <div class="options" data-key="c6">
+        <label class="option"><input type="radio" name="c6" value="0"><div class="radio-dot"></div><span class="option-text">过去一个月没有</span><span class="option-score">0分</span></label>
+        <label class="option"><input type="radio" name="c6" value="1"><div class="radio-dot"></div><span class="option-text">每周不足1次</span><span class="option-score">1分</span></label>
+        <label class="option"><input type="radio" name="c6" value="2"><div class="radio-dot"></div><span class="option-text">每周1~2次</span><span class="option-score">2分</span></label>
+        <label class="option"><input type="radio" name="c6" value="3"><div class="radio-dot"></div><span class="option-text">每周3次或以上</span><span class="option-score">3分</span></label>
+      </div>
+      <div class="q-error" id="err-c6">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Q18-Q19: 日间功能障碍 -->
+  <div class="section" id="sec-7">
+    <div class="section-header">
+      <div class="section-num">18~19</div>
+      <div class="section-title">日间功能 — 白天的精力与表现</div>
+      <div class="section-dim-tag">维度⑦</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q18</strong> 过去一个月，您是否在<strong>开车、吃饭或参加社交活动时难以保持清醒</strong>？</div>
+      <div class="options" data-key="c7a">
+        <label class="option"><input type="radio" name="c7a" value="0"><div class="radio-dot"></div><span class="option-text">过去一个月没有</span></label>
+        <label class="option"><input type="radio" name="c7a" value="1"><div class="radio-dot"></div><span class="option-text">每周不足1次</span></label>
+        <label class="option"><input type="radio" name="c7a" value="2"><div class="radio-dot"></div><span class="option-text">每周1~2次</span></label>
+        <label class="option"><input type="radio" name="c7a" value="3"><div class="radio-dot"></div><span class="option-text">每周3次或以上</span></label>
+      </div>
+      <div class="q-error" id="err-c7a">请选择一项</div>
+    </div>
+    <div class="question">
+      <div class="q-label"><strong>Q19</strong> 过去一个月，您在<strong>完成日常事务时是否感到精力不足或困难重重</strong>？</div>
+      <div class="options" data-key="c7b">
+        <label class="option"><input type="radio" name="c7b" value="0"><div class="radio-dot"></div><span class="option-text">没有困难</span></label>
+        <label class="option"><input type="radio" name="c7b" value="1"><div class="radio-dot"></div><span class="option-text">轻微困难</span></label>
+        <label class="option"><input type="radio" name="c7b" value="2"><div class="radio-dot"></div><span class="option-text">较多困难</span></label>
+        <label class="option"><input type="radio" name="c7b" value="3"><div class="radio-dot"></div><span class="option-text">很多困难</span></label>
+      </div>
+      <div class="q-error" id="err-c7b">请选择一项</div>
+    </div>
+  </div>
+
+  <!-- Submit -->
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitForm()">生成睡眠质量报告 →</button>
+    <div class="submit-note">结果仅供参考，不替代专业医疗诊断</div>
+  </div>
+
+</div><!-- /form-area -->
+
+<!-- Result Panel -->
+<div id="result-panel">
+  <!-- injected by JS -->
+</div>
+
+<div class="footer">
+  © 无忧睡眠 · PSQI 匹兹堡睡眠质量指数量表 · 中科院认证版本<br>
+  评估结果仅供参考，如有严重睡眠障碍请寻求专业医疗帮助
+</div>
+
+<script>
+// ── Freq table rows (Q5) ──
+const freqItems = [
+  { key: 'q5b', label: 'Q8 夜间醒来或早醒' },
+  { key: 'q5c', label: 'Q9 需要起床上厕所' },
+  { key: 'q5d', label: 'Q10 感到呼吸不畅' },
+  { key: 'q5e', label: 'Q11 大声咳嗽或打鼾' },
+  { key: 'q5f', label: 'Q12 感到寒冷' },
+  { key: 'q5g', label: 'Q13 感到太热' },
+  { key: 'q5h', label: 'Q14 做噩梦' },
+  { key: 'q5i', label: 'Q15 感到疼痛不适' },
+  { key: 'q5j', label: 'Q16 其他原因（综合影响）' },
+];
+
+const tbody = document.getElementById('freq-tbody');
+freqItems.forEach(item => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td>${item.label}</td>` +
+    [0,1,2,3].map(v => `<td class="center"><div class="freq-radio" data-key="${item.key}" data-val="${v}" onclick="selectFreq(this,'${item.key}',${v})"></div></td>`).join('');
+  tbody.appendChild(tr);
+});
+
+// ── Radio select ──
+document.querySelectorAll('.options').forEach(container => {
+  container.querySelectorAll('.option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      const name = opt.querySelector('input').name;
+      document.querySelectorAll(`[name="${name}"]`).forEach(r => r.closest('.option').classList.remove('selected'));
+      opt.classList.add('selected');
+      opt.querySelector('input').checked = true;
+      updateProgress();
+      hideError(container.dataset.key);
+    });
+  });
+});
+
+function selectFreq(el, key, val) {
+  // deselect same row
+  document.querySelectorAll(`.freq-radio[data-key="${key}"]`).forEach(r => r.classList.remove('selected'));
+  el.classList.add('selected');
+  updateProgress();
+}
+
+// ── Progress ──
+function countFilled() {
+  let filled = 0;
+  // C1
+  if (document.querySelector('[name="c1"]:checked')) filled++;
+  // C2: 上床时间（非必选但算进度）
+  if (document.getElementById('q2_bedtime').value) filled++;
+  // C2: 入睡时长
+  if (document.querySelector('[name="q2b"]:checked')) filled++;
+  // C2: 30分钟苦恼
+  if (document.querySelector('[name="q5a"]:checked')) filled++;
+  // C3: 起床时间
+  if (document.getElementById('q3_waketime').value) filled++;
+  // C3: 实际睡眠
+  if (document.querySelector('[name="c3"]:checked')) filled++;
+  // C4
+  if (document.querySelector('[name="c4_input"]:checked')) filled++;
+  // C5: 9项频率
+  let c5count = 0;
+  freqItems.forEach(i => { if (document.querySelector(`.freq-radio[data-key="${i.key}"].selected`)) c5count++; });
+  filled += c5count;
+  // C6
+  if (document.querySelector('[name="c6"]:checked')) filled++;
+  // C7a
+  if (document.querySelector('[name="c7a"]:checked')) filled++;
+  // C7b
+  if (document.querySelector('[name="c7b"]:checked')) filled++;
+  return filled;
+}
+
+const TOTAL_QUESTIONS = 19;
+
+function updateProgress() {
+  const n = countFilled();
+  const pct = Math.round(n / TOTAL_QUESTIONS * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = `${n} / ${TOTAL_QUESTIONS} 题已填写`;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  // activate current section
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.remove('active');
+    if (i === 0) s.classList.add('active');
+  });
+}
+
+function hideError(key) {
+  const el = document.getElementById('err-' + key);
+  if (el) el.style.display = 'none';
+}
+
+// ── Scoring ──
+function getVal(name) {
+  const el = document.querySelector(`[name="${name}"]:checked`);
+  return el ? parseInt(el.value) : null;
+}
+function getFreqVal(key) {
+  const el = document.querySelector(`.freq-radio[data-key="${key}"].selected`);
+  return el ? parseInt(el.dataset.val) : null;
+}
+
+function calcC2() {
+  const q2b = getVal('q2b');
+  const q5a = getVal('q5a');
+  if (q2b === null || q5a === null) return null;
+  const sum = q2b + q5a;
+  if (sum === 0) return 0;
+  if (sum <= 2) return 1;
+  if (sum <= 4) return 2;
+  return 3;
+}
+
+function calcC4() {
+  const sel = document.querySelector('[name="c4_input"]:checked');
+  if (!sel) return null;
+  const v = sel.value;
+  if (v === '85+') return 0;
+  if (v === '75-84') return 1;
+  if (v === '65-74') return 2;
+  return 3;
+}
+
+function calcC5() {
+  let sum = 0;
+  for (const item of freqItems) {
+    const v = getFreqVal(item.key);
+    if (v === null) return null;
+    sum += v;
+  }
+  if (sum === 0) return 0;
+  if (sum <= 9) return 1;
+  if (sum <= 18) return 2;
+  return 3;
+}
+
+function calcC7() {
+  const a = getVal('c7a');
+  const b = getVal('c7b');
+  if (a === null || b === null) return null;
+  const sum = a + b;
+  if (sum === 0) return 0;
+  if (sum <= 2) return 1;
+  if (sum <= 4) return 2;
+  return 3;
+}
+
+// ── Validate & Submit ──
+function submitForm() {
+  let valid = true;
+
+  const c1 = getVal('c1');
+  if (c1 === null) { showError('c1'); valid = false; }
+
+  const q2b = getVal('q2b');
+  if (q2b === null) { showError('q2b'); valid = false; }
+  const q5a = getVal('q5a');
+  if (q5a === null) { showError('q5a'); valid = false; }
+
+  const c3 = getVal('c3');
+  if (c3 === null) { showError('c3'); valid = false; }
+
+  const c4_raw = calcC4();
+  if (c4_raw === null) { showError('c4_input'); valid = false; }
+
+  const c5 = calcC5();
+  if (c5 === null) { showError('c5'); valid = false; }
+
+  const c6 = getVal('c6');
+  if (c6 === null) { showError('c6'); valid = false; }
+
+  const c7a = getVal('c7a');
+  if (c7a === null) { showError('c7a'); valid = false; }
+  const c7b = getVal('c7b');
+  if (c7b === null) { showError('c7b'); valid = false; }
+
+  if (!valid) {
+    const firstErr = document.querySelector('.q-error[style="display: block;"]') ||
+                     document.querySelector('.q-error:not([style])');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const scores = {
+    c1: c1,
+    c2: calcC2(),
+    c3: c3,
+    c4: c4_raw,
+    c5: c5,
+    c6: c6,
+    c7: calcC7()
+  };
+  const total = Object.values(scores).reduce((a, b) => a + b, 0);
+  showResult(scores, total);
+}
+
+function showError(key) {
+  const el = document.getElementById('err-' + key);
+  if (el) { el.style.display = 'block'; }
+}
+
+// ── Result ──
+function showResult(scores, total) {
+  document.getElementById('form-area').style.display = 'none';
+  const panel = document.getElementById('result-panel');
+  panel.style.display = 'block';
+
+  // Grade
+  let label, desc, color, ringColor;
+  if (total <= 5) {
+    label = '睡眠质量良好 😌';
+    desc = '您的睡眠状况整体健康，继续保持当前的作息规律即可。';
+    color = '#4ade80';
+    ringColor = '#4ade80';
+  } else if (total <= 10) {
+    label = '睡眠有些问题 ⚠️';
+    desc = '您存在一定程度的睡眠问题，建议关注薄弱维度，适时调整生活习惯。';
+    color = '#facc15';
+    ringColor = '#facc15';
+  } else if (total <= 15) {
+    label = '睡眠质量较差 😟';
+    desc = '睡眠问题对您的日常生活产生了明显影响，建议寻求专业指导，系统改善睡眠。';
+    color = '#fb923c';
+    ringColor = '#fb923c';
+  } else {
+    label = '睡眠严重受损 🚨';
+    desc = '您的睡眠状况严重影响健康与日间功能，强烈建议进行专业睡眠评估和干预。';
+    color = '#f87171';
+    ringColor = '#f87171';
+  }
+
+  const dimNames = ['主观睡眠质量', '睡眠潜伏期', '睡眠时间', '睡眠效率', '睡眠障碍', '催眠药物', '日间功能'];
+  const dimKeys = ['c1','c2','c3','c4','c5','c6','c7'];
+  const dimIcons = ['😴','⏱️','🕐','📊','🌙','💊','☀️'];
+
+  // Suggestions based on worst dims
+  const suggestions = [];
+  const dimSuggestions = {
+    c1: { icon: '💡', text: '整体睡眠感受较差——可能是心理预期问题，试试"80分睡眠哲学"，不追求完美的睡眠。' },
+    c2: { icon: '⏱️', text: '入睡困难——建议尝试4-7-8呼吸法，或睡前"脑倾倒"书写，把脑子里的担忧写出来清空。' },
+    c3: { icon: '🕐', text: '睡眠时间不足——先固定起床时间，比提早入睡更有效；避免周末补觉超过1小时。' },
+    c4: { icon: '📊', text: '睡眠效率低——减少在床上清醒的时间，只在真正困了才上床，提高床与睡眠的条件反射。' },
+    c5: { icon: '🌙', text: '夜间频繁觉醒——检查睡眠环境（温度18-22℃、完全遮光）；若有打鼾停止呼吸，建议做睡眠监测。' },
+    c6: { icon: '💊', text: '依赖催眠药物——药物是辅助，不是根本解决方案，建议配合行为疗法逐步减少用药。' },
+    c7: { icon: '☀️', text: '日间功能受损——说明睡眠质量已影响到工作生活，这是需要系统干预的信号，不要拖。' },
+  };
+
+  const sortedDims = dimKeys.map((k,i) => ({key:k,score:scores[k],name:dimNames[i]}))
+                            .sort((a,b) => b.score - a.score);
+  sortedDims.filter(d => d.score >= 2).forEach(d => {
+    suggestions.push(dimSuggestions[d.key]);
+  });
+  if (suggestions.length === 0) {
+    suggestions.push({ icon: '✅', text: '各维度表现均良好，继续保持规律作息和睡前放松习惯。' });
+  }
+
+  // Ring SVG
+  const r = 50, cx = 60, cy = 60;
+  const circ = 2 * Math.PI * r;
+  const pct = total / 21;
+  const dash = pct * circ;
+
+  panel.innerHTML = `
+    <div class="result-header">
+      <div class="score-ring">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#2a2a38" stroke-width="10"/>
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${ringColor}" stroke-width="10"
+            stroke-dasharray="${dash.toFixed(1)} ${circ.toFixed(1)}"
+            stroke-linecap="round"
+            style="transition:stroke-dasharray 1.2s cubic-bezier(.4,0,.2,1);"/>
+        </svg>
+        <div class="score-ring-text">
+          <div class="score-num" style="color:${color}">${total}</div>
+          <div class="score-max">/ 21</div>
+        </div>
+      </div>
+      <div class="result-label" style="color:${color}">${label}</div>
+      <div class="result-desc">${desc}</div>
+    </div>
+
+    <div style="max-width:680px;margin:0 auto;padding:0 0 8px;">
+      <div class="dim-grid">
+        ${dimKeys.map((k,i) => {
+          const s = scores[k];
+          const pctBar = s / 3 * 100;
+          const barColor = s === 0 ? '#4ade80' : s === 1 ? '#a3e635' : s === 2 ? '#facc15' : '#f87171';
+          return `<div class="dim-card">
+            <div class="dim-name">${dimIcons[i]} ${dimNames[i]}</div>
+            <div class="dim-bar-row">
+              <div class="dim-bar-bg"><div class="dim-bar-fill" style="width:${pctBar}%;background:${barColor}"></div></div>
+              <div class="dim-score" style="color:${barColor}">${s}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+
+      ${suggestions.length > 0 ? `
+      <div class="suggestion-box">
+        <h3>🎯 针对你的改善建议</h3>
+        ${suggestions.map(s => `<div class="suggestion-item"><span class="suggestion-icon">${s.icon}</span><span>${s.text}</span></div>`).join('')}
+      </div>` : ''}
+
+      <div class="cta-box">
+        <h3>想系统解决睡眠问题？</h3>
+        <p>无忧睡眠 · 睡眠力训练营<br>28天 · 4型分类 · 1对1陪跑 · 无改善全额退款</p>
+        <a class="btn-cta" href="#">了解睡眠力训练营 →</a>
+      </div>
+
+      <div style="text-align:center">
+        <button class="btn-retry" onclick="location.reload()">重新测评</button>
+      </div>
+    </div>
+  `;
+
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // animate ring
+  setTimeout(() => {
+    const circle = panel.querySelector('circle:last-child');
+    if (circle) {
+      circle.style.strokeDasharray = `${dash.toFixed(1)} ${circ.toFixed(1)}`;
+    }
+  }, 100);
+}
+</script>
+</body>
+</html>
