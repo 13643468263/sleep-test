@@ -746,7 +746,10 @@ function getCheckboxes(groupId) {
 }
 
 // ── Submit ──
-function submitConsultation() {
+// ⚠️ 部署后替换为你的 Cloudflare Worker 地址
+const API_URL = 'https://wysm-form.1439918391.workers.dev';
+
+async function submitConsultation() {
   const name = document.getElementById('f_name').value.trim();
   const wechat = document.getElementById('f_wechat').value.trim();
 
@@ -790,17 +793,37 @@ function submitConsultation() {
     // Meta
     psqiScore: new URLSearchParams(window.location.search).get('score') || '--',
     product: new URLSearchParams(window.location.search).get('product') || '--',
-    timestamp: new Date().toISOString()
   };
 
   console.log('Consultation data:', data);
 
   // Save to localStorage as backup
   const submissions = JSON.parse(localStorage.getItem('consultations') || '[]');
-  submissions.push(data);
+  submissions.push({ ...data, timestamp: new Date().toISOString() });
   localStorage.setItem('consultations', JSON.stringify(submissions));
 
-  // Show success
+  // Submit to Cloudflare Worker
+  const btn = document.querySelector('.btn-submit');
+  btn.textContent = '提交中...';
+  btn.disabled = true;
+
+  try {
+    const resp = await fetch(API_URL + '/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    const result = await resp.json();
+    if (!result.ok) {
+      console.error('Submit failed:', result.error);
+      // 仍然显示成功，数据已保存在 localStorage
+    }
+  } catch (err) {
+    console.error('Network error:', err);
+    // 仍然显示成功，数据已保存在 localStorage
+  }
+
+  // Show success (不管API是否成功，都显示成功，因为localStorage有备份)
   document.getElementById('form-area').style.display = 'none';
   document.getElementById('form-footer').style.display = 'none';
   document.getElementById('score-banner').style.display = 'none';
