@@ -283,7 +283,7 @@ body {
   <div class="result-card" id="resultCard"></div>
   <div class="result-actions">
     <button class="result-btn btn-secondary" onclick="shareResult()">📤 分享结果</button>
-    <button class="result-btn btn-primary" onclick="restartQuiz()">🔄 重新测试</button>
+    <button class="result-btn btn-secondary" onclick="restartQuiz()">🔄 重新测试</button>
   </div>
 </div>
 
@@ -645,16 +645,27 @@ function showResult() {
 
 function buildProductSection() {
   return `<div class="result-product">
-    <div class="result-product-name">🌙 睡眠力训练营</div>
-    <div class="result-product-price">¥2999 ｜ 28天系统训练</div>
-    <div class="result-product-desc">高仰珍老师亲授，28天重建你的睡眠系统，告别失眠困扰</div>
+    <div class="result-product-name">📋 下一步：深度评估你的睡眠质量</div>
+    <div class="result-product-price">PSQI 睡眠质量量表 · 仅需5分钟</div>
+    <div class="result-product-desc">知道类型只是第一步，PSQI帮你量化睡眠问题到底有多严重，再给出精准改善方案</div>
+  </div>
+  <div class="result-cta-row" style="display:flex;flex-direction:column;gap:0.75rem;width:100%;max-width:28rem;margin-bottom:1rem;">
+    <a href="https://shuimian.xyz/psqi.html" class="result-btn btn-primary" style="display:block;text-align:center;text-decoration:none;">
+      测测我的睡眠质量 → PSQI
+    </a>
+    <div style="text-align:center;font-size:0.8rem;color:#a0a0b8;margin-top:0.25rem;">
+      ⬆️ 做完PSQI会根据你的分数，精准推荐适合的改善方案
+    </div>
   </div>`;
 }
 
 function buildQrSection() {
-  return `<div class="result-qr">
-    <img src="qrcode.jpg" alt="公众号二维码" class="result-qr-img" style="width:7rem;height:7rem;border-radius:0.5rem;object-fit:cover;" onerror="this.onerror=null;this.src='qrcode.png';">
-    <div class="result-qr-text">扫码关注公众号「高仰珍无忧睡眠」<br>获取专属睡眠改善方案</div>
+  return `<div class="result-qr" style="margin-bottom:1rem;">
+    <div style="background:rgba(255,159,67,0.1);border:1px solid rgba(255,159,67,0.3);border-radius:0.75rem;padding:1.25rem;text-align:center;">
+      <div style="font-size:0.95rem;font-weight:700;color:#ff9f43;margin-bottom:0.75rem;">💬 想跟高老师聊聊？扫码加微信</div>
+      <img src="wechat-qr.jpg" alt="高仰珍微信二维码" style="width:180px;height:180px;border-radius:0.5rem;margin-bottom:0.75rem;display:block;margin-left:auto;margin-right:auto;">
+      <div style="font-size:0.75rem;color:#a0a0b8;line-height:1.5;">失眠3年亲历者 · 中科院认证心理咨询师<br>加好友备注"失眠测评"，优先通过</div>
+    </div>
   </div>`;
 }
 

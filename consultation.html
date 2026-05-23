@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>睡眠心理咨询预约表 · 无忧睡眠</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #17171f;
+    --surface2: #1e1e28;
+    --border: #2a2a38;
+    --accent: #7c6af7;
+    --accent-light: #a89af9;
+    --accent-glow: rgba(124,106,247,0.15);
+    --text: #e8e8f0;
+    --text-muted: #888899;
+    --text-dim: #555566;
+    --good: #4ade80;
+    --warn: #facc15;
+    --bad: #f87171;
+    --radius: 14px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, 'PingFang SC', 'Noto Sans SC', sans-serif;
+    min-height: 100vh;
+    padding: 0 16px 60px;
+    line-height: 1.6;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    padding: 48px 20px 24px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .badge {
+    display: inline-block;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,106,247,0.35);
+    color: var(--accent-light);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-size: clamp(22px, 5vw, 28px);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+  .header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 480px;
+    margin: 0 auto 8px;
+    line-height: 1.7;
+  }
+  .fee-note {
+    display: inline-block;
+    background: rgba(124,106,247,0.1);
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    font-size: 13px;
+    color: var(--accent-light);
+    margin-top: 8px;
+  }
+
+  /* PSQI Score Banner */
+  .score-banner {
+    max-width: 680px;
+    margin: 0 auto 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: none;
+  }
+  .score-banner.show { display: flex; align-items: center; gap: 14px; }
+  .score-num {
+    font-size: 36px;
+    font-weight: 800;
+    line-height: 1;
+    min-width: 48px;
+    text-align: center;
+  }
+  .score-info { flex: 1; }
+  .score-label { font-size: 14px; font-weight: 600; color: var(--text); }
+  .score-advice { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+  /* Wechat CTA Banner */
+  .wechat-banner {
+    max-width: 680px;
+    margin: 0 auto 16px;
+    background: rgba(255,159,67,0.08);
+    border: 1px solid rgba(255,159,67,0.25);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    text-align: center;
+  }
+  .wechat-banner-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #ff9f43;
+    margin-bottom: 4px;
+  }
+  .wechat-banner-id {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.06rem;
+    margin-bottom: 2px;
+  }
+  .wechat-banner-note {
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  /* Form */
+  .form-wrap {
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    margin-bottom: 16px;
+  }
+  .form-card h3 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-card h3 .card-icon { font-size: 16px; }
+  .form-group {
+    margin-bottom: 18px;
+  }
+  .form-group:last-child { margin-bottom: 0; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  .form-label .required {
+    color: var(--bad);
+    margin-left: 2px;
+  }
+  .form-label .optional {
+    color: var(--text-dim);
+    font-weight: 400;
+    font-size: 11px;
+    margin-left: 4px;
+  }
+  .form-input,
+  .form-select,
+  .form-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+    -webkit-appearance: none;
+  }
+  .form-input:focus,
+  .form-select:focus,
+  .form-textarea:focus { border-color: var(--accent); }
+  .form-input::placeholder,
+  .form-textarea::placeholder { color: var(--text-dim); }
+  .form-select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%23555566'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+  .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .form-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  .form-row {
+    display: flex;
+    gap: 12px;
+  }
+  .form-row .form-group { flex: 1; }
+
+  /* Checkbox / Radio groups */
+  .option-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .option-item {
+    position: relative;
+  }
+  .option-item input[type="checkbox"],
+  .option-item input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .option-item label {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .option-item input:checked + label {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+    color: var(--accent-light);
+  }
+  .option-item label:hover {
+    border-color: var(--accent);
+  }
+  .option-other-wrap {
+    margin-top: 8px;
+    display: none;
+  }
+  .option-other-wrap.show { display: block; }
+
+  /* Submit */
+  .submit-wrap {
+    max-width: 680px;
+    margin: 24px auto 0;
+    text-align: center;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, var(--accent), #9b8cf5);
+    color: #fff;
+    border: none;
+    padding: 14px 48px;
+    border-radius: 99px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.02em;
+  }
+  .btn-submit:hover { opacity: 0.9; }
+  .btn-submit:active { transform: scale(0.98); }
+  .submit-note { font-size: 12px; color: var(--text-dim); margin-top: 10px; }
+
+  /* Success */
+  #success-panel {
+    display: none;
+    max-width: 680px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 60px 20px;
+  }
+  .success-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: bounceIn 0.6s ease;
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .success-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+  .success-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 420px;
+    margin: 0 auto 24px;
+    line-height: 1.7;
+  }
+  .success-wechat {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 22px;
+    max-width: 360px;
+    margin: 0 auto 16px;
+  }
+  .success-wechat-label {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+  .success-wechat-id {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-light);
+    letter-spacing: 0.06rem;
+  }
+  .success-wechat-note {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+  .success-tip {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    max-width: 400px;
+    margin: 16px auto 0;
+    font-size: 13px;
+    color: var(--good);
+    line-height: 1.6;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px 16px;
+    font-size: 11px;
+    color: var(--text-dim);
+    max-width: 680px;
+    margin: 0 auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="badge">无忧睡眠 · 1对1咨询</div>
+  <h1>睡眠心理咨询预约表</h1>
+  <p>感谢你选择无忧睡眠的咨询服务。<br>填完这个表单后，高仰珍老师会尽快联系你确认咨询时间。</p>
+  <div class="fee-note">咨询费用：300元/次 · 5次起（1500元起）</div>
+</div>
+
+<!-- PSQI Score Banner (auto-filled from URL) -->
+<div class="score-banner" id="score-banner">
+  <div class="score-num" id="score-num">--</div>
+  <div class="score-info">
+    <div class="score-label" id="score-label">PSQI 评估分数</div>
+    <div class="score-advice" id="score-advice">来自PSQI睡眠质量自测</div>
+  </div>
+</div>
+
+<!-- Wechat CTA Banner -->
+<div class="wechat-banner">
+  <div class="wechat-banner-title">💬 有问题随时扫码加微信</div>
+  <img src="wechat-qr.jpg" alt="高仰珍微信二维码" style="width:160px;height:160px;border-radius:8px;margin:10px auto;display:block;">
+  <div class="wechat-banner-note">加好友备注"咨询预约"，优先通过</div>
+</div>
+
+<!-- Form -->
+<div class="form-wrap" id="form-area">
+
+  <!-- 1. 基本信息 -->
+  <div class="form-card">
+    <h3><span class="card-icon">👤</span> 基本信息</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">姓名<span class="required">*</span></label>
+        <input type="text" class="form-input" id="f_name" placeholder="怎么称呼你" maxlength="20">
+      </div>
+      <div class="form-group">
+        <label class="form-label">性别</label>
+        <div class="option-group" id="g_gender">
+          <div class="option-item">
+            <input type="radio" name="gender" id="g_m" value="男">
+            <label for="g_m">男</label>
+          </div>
+          <div class="option-item">
+            <input type="radio" name="gender" id="g_f" value="女">
+            <label for="g_f">女</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">年龄</label>
+      <input type="text" class="form-input" id="f_age" placeholder="例如：35" maxlength="10" inputmode="numeric">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">微信号<span class="required">*</span></label>
+        <input type="text" class="form-input" id="f_wechat" placeholder="和手机号绑定的微信号" maxlength="50">
+        <div class="form-hint">方便联系你确认咨询时间</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">手机号</label>
+        <input type="tel" class="form-input" id="f_phone" placeholder="发送咨询链接和通知" maxlength="11" inputmode="tel">
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. 失眠情况 -->
+  <div class="form-card">
+    <h3><span class="card-icon">🌙</span> 失眠情况</h3>
+
+    <div class="form-group">
+      <label class="form-label">你失眠多久了？<span class="required">*</span></label>
+      <div class="option-group" id="g_duration">
+        <div class="option-item"><input type="radio" name="duration" id="d1" value="1个月以内"><label for="d1">1个月以内</label></div>
+        <div class="option-item"><input type="radio" name="duration" id="d2" value="1-3个月"><label for="d2">1-3个月</label></div>
+        <div class="option-item"><input type="radio" name="duration" id="d3" value="3个月-1年"><label for="d3">3个月-1年</label></div>
+        <div class="option-item"><input type="radio" name="duration" id="d4" value="1年以上"><label for="d4">1年以上</label></div>
+        <div class="option-item"><input type="radio" name="duration" id="d5" value="3年以上"><label for="d5">3年以上</label></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你现在的睡眠情况是？<span class="optional">（最多选3个）</span></label>
+      <div class="option-group" id="g_symptoms" data-max="3">
+        <div class="option-item"><input type="checkbox" id="s1" value="躺下后30分钟内无法入睡"><label for="s1">躺下30分钟睡不着</label></div>
+        <div class="option-item"><input type="checkbox" id="s2" value="晚上睡眠浅，容易醒"><label for="s2">睡浅易醒</label></div>
+        <div class="option-item"><input type="checkbox" id="s3" value="凌晨醒来后无法再睡"><label for="s3">凌晨醒了睡不着</label></div>
+        <div class="option-item"><input type="checkbox" id="s4" value="睡眠时间不足5小时"><label for="s4">睡眠不足5小时</label></div>
+        <div class="option-item"><input type="checkbox" id="s5" value="白天精神不济"><label for="s5">白天精神差</label></div>
+        <div class="option-item">
+          <input type="checkbox" id="s6" value="其他">
+          <label for="s6">其他</label>
+        </div>
+      </div>
+      <div class="option-other-wrap" id="symptom-other">
+        <input type="text" class="form-input" id="f_symptom_other" placeholder="简单描述..." maxlength="100">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你失眠的主要原因是什么？<span class="optional">（最多选3个）</span></label>
+      <div class="option-group" id="g_causes" data-max="3">
+        <div class="option-item"><input type="checkbox" id="c1" value="工作/学习压力"><label for="c1">工作/学习压力</label></div>
+        <div class="option-item"><input type="checkbox" id="c2" value="焦虑/担忧"><label for="c2">焦虑/担忧</label></div>
+        <div class="option-item"><input type="checkbox" id="c3" value="抑郁/情绪低落"><label for="c3">抑郁/情绪低落</label></div>
+        <div class="option-item"><input type="checkbox" id="c4" value="生活变故"><label for="c4">生活变故</label></div>
+        <div class="option-item"><input type="checkbox" id="c5" value="健康问题"><label for="c5">健康问题</label></div>
+        <div class="option-item"><input type="checkbox" id="c6" value="长期熬夜导致生物钟紊乱"><label for="c6">生物钟紊乱</label></div>
+        <div class="option-item"><input type="checkbox" id="c7" value="不清楚原因"><label for="c7">不清楚原因</label></div>
+        <div class="option-item">
+          <input type="checkbox" id="c8" value="其他">
+          <label for="c8">其他</label>
+        </div>
+      </div>
+      <div class="option-other-wrap" id="cause-other">
+        <input type="text" class="form-input" id="f_cause_other" placeholder="简单描述..." maxlength="100">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你之前是否尝试过改善睡眠？<span class="optional">（多选）</span></label>
+      <div class="option-group" id="g_tried">
+        <div class="option-item"><input type="checkbox" id="t1" value="褪黑素/药物"><label for="t1">褪黑素/药物</label></div>
+        <div class="option-item"><input type="checkbox" id="t2" value="助眠APP/音乐"><label for="t2">助眠APP/音乐</label></div>
+        <div class="option-item"><input type="checkbox" id="t3" value="运动/冥想/正念"><label for="t3">运动/冥想/正念</label></div>
+        <div class="option-item"><input type="checkbox" id="t4" value="心理咨询"><label for="t4">心理咨询</label></div>
+        <div class="option-item"><input type="checkbox" id="t5" value="中医/针灸/按摩"><label for="t5">中医/针灸/按摩</label></div>
+        <div class="option-item"><input type="checkbox" id="t6" value="没有，这是第一次"><label for="t6">第一次寻求改善</label></div>
+        <div class="option-item">
+          <input type="checkbox" id="t7" value="其他">
+          <label for="t7">其他</label>
+        </div>
+      </div>
+      <div class="option-other-wrap" id="tried-other">
+        <input type="text" class="form-input" id="f_tried_other" placeholder="简单描述..." maxlength="100">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你现在有在服用药物吗？</label>
+      <div class="option-group" id="g_medication">
+        <div class="option-item"><input type="radio" name="medication" id="m1" value="没有"><label for="m1">没有</label></div>
+        <div class="option-item"><input type="radio" name="medication" id="m2" value="安眠药"><label for="m2">安眠药</label></div>
+        <div class="option-item"><input type="radio" name="medication" id="m3" value="抗抑郁/焦虑药"><label for="m3">抗抑郁/焦虑药</label></div>
+        <div class="option-item"><input type="radio" name="medication" id="m4" value="中药"><label for="m4">中药</label></div>
+        <div class="option-item">
+          <input type="radio" name="medication" id="m5" value="其他">
+          <label for="m5">其他</label>
+        </div>
+      </div>
+      <div class="option-other-wrap" id="med-other">
+        <input type="text" class="form-input" id="f_med_other" placeholder="什么药..." maxlength="50">
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. 咨询相关 -->
+  <div class="form-card">
+    <h3><span class="card-icon">💭</span> 咨询相关</h3>
+
+    <div class="form-group">
+      <label class="form-label">你希望通过咨询解决什么问题？</label>
+      <textarea class="form-textarea" id="f_goal" placeholder="请简要描述，100字以内" maxlength="100"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你之前是否做过心理咨询？</label>
+      <div class="option-group" id="g_prev_therapy">
+        <div class="option-item"><input type="radio" name="prev_therapy" id="pt1" value="没有"><label for="pt1">没有</label></div>
+        <div class="option-item"><input type="radio" name="prev_therapy" id="pt2" value="做过1-3次"><label for="pt2">1-3次</label></div>
+        <div class="option-item"><input type="radio" name="prev_therapy" id="pt3" value="做过3次以上"><label for="pt3">3次以上</label></div>
+        <div class="option-item"><input type="radio" name="prev_therapy" id="pt4" value="长期做咨询"><label for="pt4">长期做咨询</label></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你是否了解睡眠认知行为疗法（CBT-I）？</label>
+      <div class="option-group" id="g_cbti">
+        <div class="option-item"><input type="radio" name="cbti" id="cb1" value="完全不了解"><label for="cb1">完全不了解</label></div>
+        <div class="option-item"><input type="radio" name="cbti" id="cb2" value="听说过"><label for="cb2">听说过</label></div>
+        <div class="option-item"><input type="radio" name="cbti" id="cb3" value="了解一些"><label for="cb3">了解一些</label></div>
+        <div class="option-item"><input type="radio" name="cbti" id="cb4" value="很了解"><label for="cb4">很了解</label></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你现在有严重的心理问题吗？</label>
+      <div class="option-group" id="g_mental">
+        <div class="option-item"><input type="radio" name="mental" id="mt1" value="没有"><label for="mt1">没有</label></div>
+        <div class="option-item"><input type="radio" name="mental" id="mt2" value="轻度焦虑/抑郁"><label for="mt2">轻度焦虑/抑郁</label></div>
+        <div class="option-item"><input type="radio" name="mental" id="mt3" value="中度焦虑/抑郁"><label for="mt3">中度焦虑/抑郁</label></div>
+        <div class="option-item">
+          <input type="radio" name="mental" id="mt4" value="重度焦虑/抑郁/自杀倾向" style="display:none;">
+          <label for="mt4" style="color:var(--bad);border-color:rgba(248,113,113,0.3);">重度/自杀倾向</label>
+        </div>
+      </div>
+      <div class="form-hint" style="margin-top:6px;color:var(--bad);">⚠️ 如有自杀倾向，请先拨打24h心理援助热线：400-161-9995</div>
+    </div>
+  </div>
+
+  <!-- 4. 咨询时间 -->
+  <div class="form-card">
+    <h3><span class="card-icon">📅</span> 咨询时间</h3>
+
+    <div class="form-group">
+      <label class="form-label">你希望什么时间咨询？<span class="optional">（最多选3个）</span></label>
+      <div class="option-group" id="g_time_slots" data-max="3">
+        <div class="option-item"><input type="checkbox" id="ts1" value="工作日上午9-12点"><label for="ts1">工作日上午</label></div>
+        <div class="option-item"><input type="checkbox" id="ts2" value="工作日下午14-17点"><label for="ts2">工作日下午</label></div>
+        <div class="option-item"><input type="checkbox" id="ts3" value="工作日晚上19-21点"><label for="ts3">工作日晚上</label></div>
+        <div class="option-item"><input type="checkbox" id="ts4" value="周末上午9-12点"><label for="ts4">周末上午</label></div>
+        <div class="option-item"><input type="checkbox" id="ts5" value="周日下午14-17点"><label for="ts5">周日下午</label></div>
+        <div class="option-item"><input type="checkbox" id="ts6" value="周末晚上19-21点"><label for="ts6">周末晚上</label></div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">你更倾向什么咨询形式？</label>
+      <div class="option-group" id="g_format">
+        <div class="option-item"><input type="radio" name="format" id="fmt1" value="线上视频（腾讯会议/微信视频）"><label for="fmt1">线上视频</label></div>
+        <div class="option-item"><input type="radio" name="format" id="fmt2" value="线上语音（微信语音/电话）"><label for="fmt2">线上语音</label></div>
+        <div class="option-item"><input type="radio" name="format" id="fmt3" value="线下面谈（北京）"><label for="fmt3">线下面谈</label></div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">你希望咨询的频率？</label>
+        <div class="option-group" id="g_freq">
+          <div class="option-item"><input type="radio" name="freq" id="fr1" value="每周1次"><label for="fr1">每周1次</label></div>
+          <div class="option-item"><input type="radio" name="freq" id="fr2" value="每两周1次"><label for="fr2">每两周1次</label></div>
+          <div class="option-item"><input type="radio" name="freq" id="fr3" value="每月1次"><label for="fr3">每月1次</label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">你计划做几次咨询？</label>
+        <div class="option-group" id="g_sessions">
+          <div class="option-item"><input type="radio" name="sessions" id="se1" value="1次尝试"><label for="se1">1次尝试</label></div>
+          <div class="option-item"><input type="radio" name="sessions" id="se2" value="3-5次"><label for="se2">3-5次</label></div>
+          <div class="option-item"><input type="radio" name="sessions" id="se3" value="5-10次"><label for="se3">5-10次</label></div>
+          <div class="option-item"><input type="radio" name="sessions" id="se4" value="10次以上"><label for="se4">10次以上</label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. 其他 -->
+  <div class="form-card">
+    <h3><span class="card-icon">✏️</span> 其他</h3>
+    <div class="form-group">
+      <label class="form-label">你是从哪里知道我的？</label>
+      <div class="option-group" id="g_source">
+        <div class="option-item"><input type="radio" name="source" id="src1" value="视频号"><label for="src1">视频号</label></div>
+        <div class="option-item"><input type="radio" name="source" id="src2" value="小红书"><label for="src2">小红书</label></div>
+        <div class="option-item"><input type="radio" name="source" id="src3" value="公众号"><label for="src3">公众号</label></div>
+        <div class="option-item"><input type="radio" name="source" id="src4" value="朋友推荐"><label for="src4">朋友推荐</label></div>
+        <div class="option-item">
+          <input type="radio" name="source" id="src5" value="其他">
+          <label for="src5">其他</label>
+        </div>
+      </div>
+      <div class="option-other-wrap" id="source-other">
+        <input type="text" class="form-input" id="f_source_other" placeholder="从哪里知道的..." maxlength="50">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">你还有其他想告诉我的吗？<span class="optional">（可选）</span></label>
+      <textarea class="form-textarea" id="f_note" placeholder="任何你想说的..." maxlength="200" style="min-height:60px;"></textarea>
+    </div>
+  </div>
+
+  <div class="submit-wrap">
+    <button class="btn-submit" onclick="submitConsultation()">提交预约 →</button>
+    <div class="submit-note">高仰珍老师将在24小时内联系您</div>
+  </div>
+</div>
+
+<!-- Success Panel -->
+<div id="success-panel">
+  <div class="success-icon">✅</div>
+  <div class="success-title">已收到你的预约信息！</div>
+  <div class="success-desc">
+    高仰珍老师将在 <strong>24小时内</strong> 联系你确认咨询时间。<br>
+    你也可以主动加微信，更快获得回复：
+  </div>
+  <div class="success-wechat">
+    <div class="success-wechat-label">高仰珍老师微信</div>
+    <img src="wechat-qr.jpg" alt="高仰珍微信二维码" style="width:160px;height:160px;border-radius:8px;margin:10px auto;display:block;">
+    <div class="success-wechat-note">加好友备注"咨询预约"，优先通过</div>
+  </div>
+  <div class="success-tip">
+    💡 首次咨询前，你可以先做这两件事：<br>
+    1. 记录最近一周的睡眠日记（几点躺下、几点睡着、几点醒）<br>
+    2. 准备好你想问的问题，咨询时效率更高
+  </div>
+  <div style="font-size:12px;color:var(--text-dim);margin-top:20px;">
+    © 无忧睡眠 · 让每个失眠的人都能睡个好觉
+  </div>
+</div>
+
+<div class="footer" id="form-footer">
+  © 无忧睡眠 · 中科院认证心理咨询师 · 失眠3年亲历者<br>
+  评估结果仅供参考，如有严重睡眠障碍请寻求专业医疗帮助
+</div>
+
+<script>
+// ── Parse URL params (PSQI score + product type) ──
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const score = params.get('score');
+  const product = params.get('product');
+
+  if (score) {
+    const s = parseInt(score);
+    const banner = document.getElementById('score-banner');
+    const numEl = document.getElementById('score-num');
+    const labelEl = document.getElementById('score-label');
+    const adviceEl = document.getElementById('score-advice');
+
+    banner.classList.add('show');
+    numEl.textContent = s;
+    let color = '#4ade80';
+    let level = '睡眠质量良好';
+    let advice = '建议通过认知调整进一步优化睡眠';
+    if (s > 15) { color = '#f87171'; level = '睡眠严重受损'; advice = '强烈建议尽快进行1对1评估'; }
+    else if (s > 10) { color = '#fb923c'; level = '睡眠质量较差'; advice = '建议进行1对1深度咨询'; }
+    else if (s > 5) { color = '#facc15'; level = '睡眠有些问题'; advice = '建议通过行为干预系统改善'; }
+    numEl.style.color = color;
+    labelEl.textContent = `PSQI ${s}分 · ${level}`;
+    adviceEl.textContent = advice;
+  }
+
+  if (product) {
+    console.log('Product type:', product);
+  }
+})();
+
+// ── Checkbox max limit ──
+document.querySelectorAll('.option-group[data-max]').forEach(group => {
+  const max = parseInt(group.dataset.max);
+  group.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', function() {
+      const checked = group.querySelectorAll('input[type="checkbox"]:checked');
+      if (checked.length > max) {
+        this.checked = false;
+      }
+    });
+  });
+});
+
+// ── Show "other" input when "其他" is selected ──
+// Symptoms
+document.getElementById('s6').addEventListener('change', function() {
+  document.getElementById('symptom-other').classList.toggle('show', this.checked);
+  if (!this.checked) document.getElementById('f_symptom_other').value = '';
+});
+// Causes
+document.getElementById('c8').addEventListener('change', function() {
+  document.getElementById('cause-other').classList.toggle('show', this.checked);
+  if (!this.checked) document.getElementById('f_cause_other').value = '';
+});
+// Tried
+document.getElementById('t7').addEventListener('change', function() {
+  document.getElementById('tried-other').classList.toggle('show', this.checked);
+  if (!this.checked) document.getElementById('f_tried_other').value = '';
+});
+// Medication
+document.querySelectorAll('input[name="medication"]').forEach(r => {
+  r.addEventListener('change', function() {
+    document.getElementById('med-other').classList.toggle('show', this.value === '其他');
+  });
+});
+// Source
+document.querySelectorAll('input[name="source"]').forEach(r => {
+  r.addEventListener('change', function() {
+    document.getElementById('source-other').classList.toggle('show', this.value === '其他');
+  });
+});
+
+// ── Collect radio/checkbox values helper ──
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+function getCheckboxes(groupId) {
+  const group = document.getElementById(groupId);
+  if (!group) return [];
+  const checked = group.querySelectorAll('input[type="checkbox"]:checked');
+  return Array.from(checked).map(c => c.value);
+}
+
+// ── Submit ──
+function submitConsultation() {
+  const name = document.getElementById('f_name').value.trim();
+  const wechat = document.getElementById('f_wechat').value.trim();
+
+  // Validation
+  if (!name) { alert('请填写你的姓名'); document.getElementById('f_name').focus(); return; }
+  if (!wechat) { alert('请填写微信号，方便联系你'); document.getElementById('f_wechat').focus(); return; }
+  if (!getRadio('duration')) { alert('请选择失眠时长'); return; }
+
+  // Collect all data
+  const data = {
+    // 1. 基本信息
+    name: name,
+    gender: getRadio('gender'),
+    age: document.getElementById('f_age').value.trim(),
+    wechat: wechat,
+    phone: document.getElementById('f_phone').value.trim(),
+    // 2. 失眠情况
+    duration: getRadio('duration'),
+    symptoms: getCheckboxes('g_symptoms'),
+    symptomOther: document.getElementById('f_symptom_other').value.trim(),
+    causes: getCheckboxes('g_causes'),
+    causeOther: document.getElementById('f_cause_other').value.trim(),
+    tried: getCheckboxes('g_tried'),
+    triedOther: document.getElementById('f_tried_other').value.trim(),
+    medication: getRadio('medication'),
+    medicationOther: document.getElementById('f_med_other').value.trim(),
+    // 3. 咨询相关
+    goal: document.getElementById('f_goal').value.trim(),
+    prevTherapy: getRadio('prev_therapy'),
+    cbti: getRadio('cbti'),
+    mental: getRadio('mental'),
+    // 4. 咨询时间
+    timeSlots: getCheckboxes('g_time_slots'),
+    format: getRadio('format'),
+    frequency: getRadio('freq'),
+    sessions: getRadio('sessions'),
+    // 5. 其他
+    source: getRadio('source'),
+    sourceOther: document.getElementById('f_source_other').value.trim(),
+    note: document.getElementById('f_note').value.trim(),
+    // Meta
+    psqiScore: new URLSearchParams(window.location.search).get('score') || '--',
+    product: new URLSearchParams(window.location.search).get('product') || '--',
+    timestamp: new Date().toISOString()
+  };
+
+  console.log('Consultation data:', data);
+
+  // Save to localStorage as backup
+  const submissions = JSON.parse(localStorage.getItem('consultations') || '[]');
+  submissions.push(data);
+  localStorage.setItem('consultations', JSON.stringify(submissions));
+
+  // Show success
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('form-footer').style.display = 'none';
+  document.getElementById('score-banner').style.display = 'none';
+  document.querySelector('.wechat-banner').style.display = 'none';
+  document.getElementById('success-panel').style.display = 'block';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

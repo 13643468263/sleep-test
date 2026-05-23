@@ -934,11 +934,7 @@ function showResult(scores, total) {
         ${suggestions.map(s => `<div class="suggestion-item"><span class="suggestion-icon">${s.icon}</span><span>${s.text}</span></div>`).join('')}
       </div>` : ''}
 
-      <div class="cta-box">
-        <h3>想系统解决睡眠问题？</h3>
-        <p>无忧睡眠 · 睡眠力训练营<br>28天 · 4型分类 · 1对1陪跑 · 无改善全额退款</p>
-        <a class="btn-cta" href="#">了解睡眠力训练营 →</a>
-      </div>
+      ${buildSmartCTA(total)}
 
       <div style="text-align:center">
         <button class="btn-retry" onclick="location.reload()">重新测评</button>
@@ -955,6 +951,48 @@ function showResult(scores, total) {
       circle.style.strokeDasharray = `${dash.toFixed(1)} ${circ.toFixed(1)}`;
     }
   }, 100);
+}
+
+// ── Smart CTA by PSQI score ──
+function buildSmartCTA(total) {
+  let productHTML = '';
+  let wechatHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;text-align:center;">
+      <div style="font-size:15px;font-weight:700;color:var(--accent-light);margin-bottom:12px;">💬 想跟高老师聊聊？扫码加微信</div>
+      <img src="wechat-qr.jpg" alt="高仰珍微信二维码" style="width:180px;height:180px;border-radius:8px;margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;">
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">失眠3年亲历者 · 中科院认证心理咨询师<br>加好友备注"PSQI测评"，优先通过</div>
+    </div>`;
+
+  if (total <= 5) {
+    // 睡眠质量良好 → 助眠读书会（改认知）
+    productHTML = `
+    <div class="cta-box">
+      <h3>📖 你的睡眠底子不错，但可以更好</h3>
+      <p>轻度睡眠困扰，核心是"认知调整"——改变对睡眠的焦虑和错误观念。<br><strong>助眠读书会 · ¥149</strong><br>28天 · 共读3本睡眠经典 · 群内答疑 · 改变认知才能守住好睡眠</p>
+      <a class="btn-cta" href="https://shuimian.xyz/consultation.html?score=${total}&product=bookclub" style="margin-bottom:10px;">了解助眠读书会 →</a>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">⬆️ 适合PSQI 0-5分 · 认知改变 · 防止恶化</div>
+    </div>`;
+  } else if (total <= 10) {
+    // 睡眠有些问题 → 睡眠力训练营（改行为）
+    productHTML = `
+    <div class="cta-box">
+      <h3>🔥 你的睡眠问题需要行动干预了</h3>
+      <p>光靠调整认知不够，需要系统改变睡眠行为。<br><strong>睡眠力训练营 · ¥2999</strong><br>56天 · 半私教6-8人 · CBT-I行为疗法 · 1对1陪跑 · 无改善全额退款</p>
+      <a class="btn-cta" href="https://shuimian.xyz/consultation.html?score=${total}&product=training" style="margin-bottom:10px;">了解睡眠力训练营 →</a>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">⬆️ 适合PSQI 6-10分 · 行为改变 · 56天系统重建</div>
+    </div>`;
+  } else {
+    // 睡眠质量差/严重 → 预约1对1咨询
+    productHTML = `
+    <div class="cta-box" style="border-color:rgba(248,113,113,0.3);background:linear-gradient(135deg,rgba(248,113,113,0.12),rgba(251,146,60,0.08));">
+      <h3>🚨 你的睡眠问题比较严重，别再拖了</h3>
+      <p>PSQI ${total}分属于${total > 15 ? '严重受损' : '较差'}水平，建议先做1对1评估，再制定个性化方案。<br><strong>1对1睡眠咨询 · ¥500起</strong><br>高仰珍老师亲自评估 · 制定个性化方案 · 可升级训练营或乙十全案</p>
+      <a class="btn-cta" href="https://shuimian.xyz/consultation.html?score=${total}&product=consult" style="background:linear-gradient(135deg,#f87171,#fb923c);margin-bottom:10px;">预约1对1咨询 →</a>
+      <div style="font-size:11px;color:var(--text-dim);margin-top:4px;">⬆️ 适合PSQI >10分 · 1对1评估 · 个性化方案</div>
+    </div>`;
+  }
+
+  return productHTML + wechatHTML;
 }
 </script>
 </body>
